@@ -24,7 +24,6 @@
 
       div {
         user-select: none;
-        font-size: 100vh;
         font-family: "Bubblegum Sans";
         color: rgb(125, 162, 218);
         text-align: center;
@@ -34,6 +33,18 @@
         right: 0;
         bottom: 0;
         top: 0;
+      }
+
+      @media (orientation: landscape) {
+        div {
+          font-size: 100vh;
+        }
+      }
+
+      @media (orientation: portrait) {
+        div {
+          font-size: 100vw;
+        }
       }
     </style>
   </head>
@@ -56,45 +67,64 @@
         "rollIn"
       ];
 
+      var lettersAndNumbers = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
       var fonts = ["Mystery Quest", "Bubblegum Sans"];
 
-      document.onkeypress = function(event) {
-        if (!isInit) init();
+      document.addEventListener(
+        "touchstart",
+        () => {
+          if (!isWorking) {
+            renderLetter(getRandomItem(lettersAndNumbers));
+          }
+        },
+        false
+      );
 
-        event = event || window.event;
+      document.onkeypress = event => {
+        var event = event || window.event;
         var key = event.key.toUpperCase();
 
         if (/[A-Z0-9]/.test(key) && !isWorking) {
-          setTimeout(() => {
-            isWorking = false;
-          }, 750);
-
-          isWorking = true;
-          speechSynthesis.cancel();
-
-          var letter = document.createElement("div");
-          letter.classList.add("animated", getRandomItem(animations));
-          letter.style.color = getColor();
-          letter.style.fontFamily = getRandomItem(fonts);
-          letter.innerHTML = key;
-
-          document.body.style.background = getBackground();
-          content.innerHTML = "";
-          content.appendChild(letter);
-
-          setTimeout(() => {
-            var u = new SpeechSynthesisUtterance(key);
-            u.pitch = 1.2;
-            u.rate = 0.8;
-            speechSynthesis.speak(u);
-          }, 100);
+          renderLetter(key);
         }
       };
 
+      function renderLetter(key) {
+        setTimeout(() => {
+          isWorking = false;
+        }, 750);
+
+        isWorking = true;
+        speechSynthesis.cancel();
+
+        var letter = document.createElement("div");
+        letter.classList.add("animated", getRandomItem(animations));
+        letter.style.color = getColor();
+        letter.style.fontFamily = getRandomItem(fonts);
+        letter.innerHTML = key;
+
+        document.body.style.background = getBackground();
+        content.innerHTML = "";
+        content.appendChild(letter);
+
+        setTimeout(() => {
+          var u = new SpeechSynthesisUtterance(key);
+          u.pitch = 1.2;
+          u.rate = 0.8;
+          speechSynthesis.speak(u);
+        }, 100);
+      }
+
       function init() {
         content = document.getElementById("content");
+        var isTouchDevice = "ontouchstart" in document.documentElement;
+
+        content.innerHTML = isTouchDevice
+          ? "Tap or click any key to start"
+          : "Click any key to start";
+
         playAudio();
-        isInit = true;
       }
 
       function playAudio() {
@@ -151,6 +181,9 @@
         );
       }
     </script>
-    <div id="content">Click any key to start</div>
+    <div id="content"></div>
+    <script>
+      init();
+    </script>
   </body>
 </html>
