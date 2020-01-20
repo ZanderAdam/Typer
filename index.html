@@ -1,0 +1,136 @@
+<html>
+  <head>
+    <title>Typer</title>
+    <link
+      href="https://fonts.googleapis.com/css?family=Bubblegum+Sans|Mystery+Quest&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css"
+    />
+
+    <style>
+      body {
+        font-family: cursive;
+        background: #fff8b4;
+        overflow: hidden;
+        transition: background 1s;
+      }
+
+      #content {
+        font-size: 4em;
+      }
+
+      div {
+        font-size: 100vh;
+        font-family: "Bubblegum Sans";
+        color: rgb(125, 162, 218);
+        text-align: center;
+        line-height: 100vh;
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="text/javascript">
+      var isWorking = false;
+      var isInit = false;
+
+      var animations = [
+        "fadeIn",
+        "fadeInUp",
+        "fadeInDown",
+        "fadeInLeft",
+        "fadeInRight",
+        "bounceIn",
+        "bounceInDown",
+        "bounceInUp",
+        "bounceInLeft",
+        "bounceInRight",
+        "rollIn"
+      ];
+
+      var fonts = ["Mystery Quest", "Bubblegum Sans"];
+
+      document.onkeypress = function(event) {
+        if (!isInit) init();
+
+        event = event || window.event;
+        var key = event.key.toUpperCase();
+
+        if (/[A-Z0-9]/.test(key) && !isWorking) {
+          setTimeout(() => {
+            isWorking = false;
+          }, 750);
+
+          isWorking = true;
+          speechSynthesis.cancel();
+
+          var letter = document.createElement("div");
+          letter.classList.add("animated", getRandomItem(animations));
+          letter.style.color = getColor();
+          letter.style.fontFamily = getRandomItem(fonts);
+          letter.innerHTML = key;
+
+          document.body.style.background = getBackground();
+          content.innerHTML = "";
+          content.appendChild(letter);
+
+          setTimeout(() => {
+            var u = new SpeechSynthesisUtterance(key);
+            u.pitch = 1.2;
+            u.rate = 0.8;
+            speechSynthesis.speak(u);
+          }, 100);
+        }
+      };
+
+      function init() {
+        content = document.getElementById("content");
+        isInit = true;
+      }
+
+      function animateCSS(element, animationName, callBack) {
+        element.classList.add("animated", animationName);
+      }
+
+      function getRandomItem(items) {
+        return items[randomNumber(items.length)];
+      }
+
+      function randomNumber(max) {
+        return Math.floor(Math.random() * max);
+      }
+
+      function getColor() {
+        return (
+          "hsl(" +
+          360 * Math.random() +
+          "," +
+          (25 + 70 * Math.random()) +
+          "%," +
+          (60 + 10 * Math.random()) +
+          "%)"
+        );
+      }
+
+      function getBackground() {
+        return (
+          "hsl(" +
+          360 * Math.random() +
+          "," +
+          (25 + 70 * Math.random()) +
+          "%," +
+          (88 + 10 * Math.random()) +
+          "%)"
+        );
+      }
+    </script>
+    <div id="content">Click any key to start</div>
+  </body>
+</html>
