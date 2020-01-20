@@ -91,6 +91,8 @@
       };
 
       function renderLetter(key) {
+        start();
+
         setTimeout(() => {
           isWorking = false;
         }, 750);
@@ -116,6 +118,14 @@
         }, 100);
       }
 
+      function start() {
+        if (isInit) return;
+
+        playAudio();
+
+        isInit = true;
+      }
+
       function init() {
         content = document.getElementById("content");
         var isTouchDevice = "ontouchstart" in document.documentElement;
@@ -123,26 +133,29 @@
         content.innerHTML = isTouchDevice
           ? "Tap or click any key to start"
           : "Click any key to start";
-
-        playAudio();
       }
 
       function playAudio() {
         currSongIndex = randomNumber(3) + 1;
 
-        var playSong = () => {
-          var audio = new Audio("audio/background" + currSongIndex + ".mp3");
-          audio.volume = 0.1;
-          audio.play();
-
-          currSongIndex++;
-
-          if (currSongIndex > 3) currSongIndex = 1;
-
-          audio.onended = playSong;
-        };
-
         playSong();
+      }
+
+      function playSong() {
+        var audio = new Audio("audio/background" + currSongIndex + ".mp3");
+        audio.volume = 0.1;
+        var promise = audio.play();
+        if (promise) {
+          promise.catch(function(error) {
+            console.error(error);
+          });
+        }
+
+        currSongIndex++;
+
+        if (currSongIndex > 3) currSongIndex = 1;
+
+        audio.onended = playSong;
       }
 
       function animateCSS(element, animationName, callBack) {
