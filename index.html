@@ -23,6 +23,7 @@
       }
 
       div {
+        user-select: none;
         font-size: 100vh;
         font-family: "Bubblegum Sans";
         color: rgb(125, 162, 218);
@@ -92,7 +93,26 @@
 
       function init() {
         content = document.getElementById("content");
+        playAudio();
         isInit = true;
+      }
+
+      function playAudio() {
+        currSongIndex = randomNumber(3) + 1;
+
+        var playSong = () => {
+          var audio = new Audio("audio/background" + currSongIndex + ".mp3");
+          audio.volume = 0.1;
+          audio.play();
+
+          currSongIndex++;
+
+          if (currSongIndex > 3) currSongIndex = 1;
+
+          audio.onended = playSong;
+        };
+
+        playSong();
       }
 
       function animateCSS(element, animationName, callBack) {
@@ -124,7 +144,7 @@
           "hsl(" +
           360 * Math.random() +
           "," +
-          (25 + 70 * Math.random()) +
+          (50 + 70 * Math.random()) +
           "%," +
           (88 + 10 * Math.random()) +
           "%)"
